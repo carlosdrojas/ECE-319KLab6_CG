@@ -1,0 +1,8 @@
+*.*
+Debug/
+!.gitattributes
+!.gitignore
+!readme.md
+!.gitkeep
+!ECE319K_Lab5Grader.c
+!ECE319K_Lab5main.c

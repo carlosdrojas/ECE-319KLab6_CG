@@ -21,7 +21,7 @@ char EID2[]="GOO287";  // student's EID
 void Dec2String(uint32_t n, char *p);
 // use main0 to test udivby10
 // does not need ST7735R connected
-int main(void){ // main0
+int main0(void){ // main0
   Clock_Init80MHz(0);
   LaunchPad_Init();
   Test_udivby10(); // defined in StringConversion.s
@@ -31,14 +31,14 @@ int main(void){ // main0
 
 // use main1 for testing
 // does not need ST7735R connected
-int main1(void){ // main1
+int main(void){ // main1
   Clock_Init80MHz(0);
   LaunchPad_Init();
 // Lab6Grader(1) to test SPIOutCommand, no grading
 // Lab6Grader(2) to test SPIOutData, no grading
 // Lab6Grader(3) to test GradeDec2String, no grading
 // Lab6Grader(4) to test all three with grading
-  Lab6Grader(4);
+  Lab6Grader(1);
   while(1){
   }
 }

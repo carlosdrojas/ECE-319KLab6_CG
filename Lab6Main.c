@@ -38,7 +38,7 @@ int main(void){ // main1
 // Lab6Grader(2) to test SPIOutData, no grading
 // Lab6Grader(3) to test GradeDec2String, no grading
 // Lab6Grader(4) to test all three with grading
-  Lab6Grader(2);
+  Lab6Grader(4);
   while(1){
   }
 }

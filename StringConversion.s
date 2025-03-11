@@ -71,11 +71,65 @@ udivby10:
 // Input: R0 (call by value) 16-bit unsigned number
 // Output: none
 // Invariables: This function must not permanently modify registers R4 to R11
-OutDec:
-   PUSH {LR}
-// write this
 
-   POP  {PC}
+    .equ n, 0           // *Binding*: Local variable n at offset 0 w.r.t SP
+    .equ buffer, 4      // Local variable buffer at offset 4 w.r.t SP
+    .equ count, 24      // Local variable count at offset 24 w.r.t SP
+
+OutDec:
+    PUSH {R4, R5, R6, R7, LR} // Save registers
+    SUB SP, #28               // *Allocation*: Allocate 3 local variables (all 4-byte aligned)
+
+    MOV R4, R0                // Copy input number n
+    STR R4, [SP, #n]          // Store n on stack
+    MOVs R5, #0                // count = 0
+    STR R5, [SP, #count]      // Store count on stack
+    ADD R6, SP, #buffer       // Store base address of buffer in R6
+
+ExtractDigits:
+    LDR R4, [SP, #n]          // Load n
+    CMP R4, #0                // If n == 0 and count > 0, go to PrintDigits
+    BEQ PrintDigits
+
+    // Compute quotient (n / 10) and remainder (n % 10)
+    MOV R0, R4                // Load n into R0
+    MOVS R1, #10               // Divisor = 10
+    BL udivby10               // Calls division function
+    MOV R5, R0                // Quotient = R5
+    MOV R4, R1                // Remainder = R4
+
+    STR R5, [SP, #n]          // Store updated n = quotient
+    ADDS R4, #'0'              // Convert remainder to ASCII
+    STR R4, [R6]              // Store ASCII digit in buffer
+    ADDS R6, #4                // Move buffer pointer to next slot
+
+    LDR R5, [SP, #count]      // Load count
+    ADDS R5, #1                // count++
+    STR R5, [SP, #count]      // Store updated count
+    B ExtractDigits           // Repeat until n == 0
+
+PrintDigits:
+    LDR R5, [SP, #count]      // Load count
+    CMP R5, #0                // If count == 0, print "0"
+    BNE PrintLoop
+    MOVS R0, #'0'              // Load ASCII '0'
+    BL OutChar                // Print "0"
+    B Done
+
+PrintLoop:
+    SUBS R6, #4                // Move buffer pointer back
+    LDR R4, [R6]              // Load ASCII digit from buffer
+    MOV R0, R4
+    BL OutChar                // Print character
+    SUBS R5, #1                // count--
+    STR R5, [SP, #count]      // Store updated count
+    CMP R5, #0
+    BNE PrintLoop
+
+Done:
+    ADD SP, #28               // *DeAllocation*: Deallocate stack space
+    POP {R4, R5, R6, R7, PC}  // Restore registers and return
+    
 //* * * * * * * * End of OutDec * * * * * * * *
 
 // ECE319H recursive version

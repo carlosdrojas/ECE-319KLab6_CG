@@ -24,7 +24,7 @@
 // Note: using the clear register to clear will make it friendly
 SPIOutCommand:
 // --UUU-- Code to write a command to the LCD
-        PUSH {R4, R5, LR}
+        PUSH {R4, R5, R6, LR}
 //1) Read the SPI status register (R1 has address of SPI1->STAT) and check bit 4,
 //2) If bit 4 is high, loop back to step 1 (wait for BUSY bit to be low)
 //3) Clear D/C (GPIO PA13) to zero, be friendly (R3 has address of GPIOA->DOUTCLR31_0)
@@ -32,21 +32,21 @@ SPIOutCommand:
 //4) Write the command to the SPI data register (R2 has address of SPI1->TXDATA)
 //5) Read the SPI status register (R1 has address of SPI1->STAT) and check bit 4,
 //6) If bit 4 is high, loop back to step 5 (wait for BUSY bit to be low)
-loop:   MOVS R4, #0x10
-        ANDS R4, R1
-        MOVS R5, #0x10
-        CMP R5, R4
+loop:   LDR R6, [R1]
+        MOVS R4, #0x10
+        ANDS R6, R4
+        CMP R6, R4
         BEQ loop
         LDR R5, = 0x2000
-        BICS R5, R3 
-        STR R3, [R2]
-back:   MOVS R4, #0x10
-        ANDS R4, R1
-        MOVS R5, #0x10
-        CMP R4, R5
+        STR R5, [R3]
+        STR R0, [R2]
+back:   LDR R6, [R1]
+        MOVS R4, #0x10
+        ANDS R6, R4
+        CMP R6, #0x10
         BEQ back
 
-        POP {R4, R5, PC}    //   return
+        POP {R4, R5, R6, PC}    //   return
 
 
 
@@ -67,18 +67,18 @@ SPIOutData:
 //3) Set D/C (GPIO PA13) to one, be friendly (R3 has address of GPIOA->DOUTSET31_0)
 //    Hint: simply write 0x2000 to GPIOA->DOUTSET31_0
 //4) Write the data to the SPI data register (R2 has address of SPI1->TXDATA)
-        PUSH {R4, R5, LR}
+        PUSH {R4, R5, R6, LR}
 
-loopy:   MOVS R5, #0x10
-        ANDS R5, R1
-        MOVS R4, #0x10
-        CMP R5, R4
+loopy:  LDR R6, [R1]
+        MOVS R4, #0x02
+        ANDS R6, R4
+        CMP R6, R4
         BNE loopy
         LDR R5, = 0x2000
-        ORRS R5, R3, R5
-        STR R5, [R2]
-
-        POP {R4, R5, PC}   // return
+        STR R5, [R3]
+        STR R0, [R2]
+        
+        POP {R4, R5, R6, PC}   // return
 //****************************************************
 
     .end

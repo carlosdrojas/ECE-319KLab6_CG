@@ -1,6 +1,6 @@
 // BusyWait.s
-// Student names: change this to your names or look very silly
-// Last modification date: change this to the last modification date or look very silly
+// Student names: Carlos Rojas, Grant Osinde
+// Last modification date: 3-10-2025
 
 // Note: these functions do not actually output to SPI or Port A. 
 // They are called by the grader to see if the functions would work
@@ -24,6 +24,7 @@
 // Note: using the clear register to clear will make it friendly
 SPIOutCommand:
 // --UUU-- Code to write a command to the LCD
+    PUSH {LR}
 //1) Read the SPI status register (R1 has address of SPI1->STAT) and check bit 4,
 //2) If bit 4 is high, loop back to step 1 (wait for BUSY bit to be low)
 //3) Clear D/C (GPIO PA13) to zero, be friendly (R3 has address of GPIOA->DOUTCLR31_0)
@@ -31,7 +32,7 @@ SPIOutCommand:
 //4) Write the command to the SPI data register (R2 has address of SPI1->TXDATA)
 //5) Read the SPI status register (R1 has address of SPI1->STAT) and check bit 4,
 //6) If bit 4 is high, loop back to step 5 (wait for BUSY bit to be low)
-    PUSH {LR}
+    
 
     POP {PC}    //   return
 

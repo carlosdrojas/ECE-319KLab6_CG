@@ -80,37 +80,37 @@ OutDec:
     PUSH {R4, R5, R6, R7, LR} // Save registers
     SUB SP, #28               // *Allocation*: Allocate 3 local variables (all 4-byte aligned)
 
-    MOV R4, R0                // Copy input number n
-    STR R4, [SP, #n]          // Store n on stack
-    MOVs R5, #0                // count = 0
-    STR R5, [SP, #count]      // Store count on stack
+    MOV R4, R0                // Copy n
+    STR R4, [SP, #n]          // *Access*: Store n 
+    MOVs R5, #0                
+    STR R5, [SP, #count]      // *Access*: Store count on stack
     ADD R6, SP, #buffer       // Store base address of buffer in R6
 
 ExtractDigits:
-    LDR R4, [SP, #n]          // Load n
-    CMP R4, #0                // If n == 0 and count > 0, go to PrintDigits
+    LDR R4, [SP, #n]          // *Access*: Load n
+    CMP R4, #0                // case for 0
     BEQ PrintDigits
 
-    // Compute quotient (n / 10) and remainder (n % 10)
-    MOV R0, R4                // Load n into R0
-    MOVS R1, #10               // Divisor = 10
+    
+    MOV R0, R4                
+    // MOVS R1, #10               
     BL udivby10               // Calls division function
-    MOV R5, R0                // Quotient = R5
-    MOV R4, R1                // Remainder = R4
+    MOV R5, R0                // Quotient
+    MOV R4, R1                // Remainder
 
-    STR R5, [SP, #n]          // Store updated n = quotient
+    STR R5, [SP, #n]          // *Access*: Store updated n 
     ADDS R4, #'0'              // Convert remainder to ASCII
-    STR R4, [R6]              // Store ASCII digit in buffer
-    ADDS R6, #4                // Move buffer pointer to next slot
+    STR R4, [R6]              // Store ASCII in buffer
+    ADDS R6, #4                // Move buffer pointer 
 
-    LDR R5, [SP, #count]      // Load count
+    LDR R5, [SP, #count]      // *Access*: Load count
     ADDS R5, #1                // count++
-    STR R5, [SP, #count]      // Store updated count
-    B ExtractDigits           // Repeat until n == 0
+    STR R5, [SP, #count]      // *Access*: Store updated count
+    B ExtractDigits           // 
 
 PrintDigits:
-    LDR R5, [SP, #count]      // Load count
-    CMP R5, #0                // If count == 0, print "0"
+    LDR R5, [SP, #count]      // *Access*: Load count
+    CMP R5, #0                // 0 case
     BNE PrintLoop
     MOVS R0, #'0'              // Load ASCII '0'
     BL OutChar                // Print "0"
@@ -120,9 +120,9 @@ PrintLoop:
     SUBS R6, #4                // Move buffer pointer back
     LDR R4, [R6]              // Load ASCII digit from buffer
     MOV R0, R4
-    BL OutChar                // Print character
+    BL OutChar                // Print char
     SUBS R5, #1                // count--
-    STR R5, [SP, #count]      // Store updated count
+    STR R5, [SP, #count]      // *Access*: Store updated count
     CMP R5, #0
     BNE PrintLoop
 
